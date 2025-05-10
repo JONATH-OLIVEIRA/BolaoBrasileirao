@@ -38,7 +38,7 @@ public class Usuario implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@NotBlank(message = "Nome do usuario nao pode ser vazio")
+	@NotBlank(message = "Nome do usuário não pode ser vazio")
 	@Size(min = 3, max = 100, message = "O nome deve ter entre 3 e 100 caracteres")
 	private String nome;
 
@@ -58,22 +58,31 @@ public class Usuario implements Serializable {
 	private String cpf;
 
 	@Past(message = "Data de nascimento deve ser no passado")
-
 	private LocalDate dtNascimento;
+
+	@Column(nullable = false, updatable = false)
+	private LocalDate dataCadastro; // Data de cadastro do usuário no sistema
 
 	@Enumerated(EnumType.STRING)
 	private TipoUsuario tipo;
 
 	private boolean ativo = true; // Usuário começa como ativo
 
-	@OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Aposta> apostas;
+	@OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+	private List<Aposta> apostas; // Lista de todas as apostas feitas pelo usuário
 
 	/**
 	 * Método para verificar se o usuário tem pelo menos 18 anos
 	 */
 	public boolean isMaiorDeIdade() {
 		return Period.between(this.dtNascimento, LocalDate.now()).getYears() >= 18;
+	}
+
+	/**
+	 * Método para verificar se o usuário foi criado recentemente
+	 */
+	public boolean isRecemCriado() {
+		return this.dataCadastro.isAfter(LocalDate.now().minusDays(30));
 	}
 
 	/**
@@ -91,36 +100,27 @@ public class Usuario implements Serializable {
 	}
 
 	/**
-	 * Metodo para criptografar a senha.
-	 * 
+	 * Método para criptografar a senha
 	 */
 	public void criptografarSenha() {
 		this.senha = passwordEncoder.encode(this.senha);
 	}
 
 	/**
-	 * Metodo para validar a senha.
-	 * 
-	 * @param senha
-	 * @param encoder
-	 * @return senha validada.
+	 * Método para validar a senha
 	 */
 	public boolean validarSenha(String senha, PasswordEncoder encoder) {
 		return encoder.matches(senha, this.senha);
 	}
 
+	// 🔹 Construtor padrão
 	public Usuario() {
-
+		this.dataCadastro = LocalDate.now(); // Define automaticamente a data de cadastro
 	}
 
-	public Usuario(Long id,
-			@NotBlank(message = "Nome do usuario nao pode ser vazio") @Size(min = 3, max = 100, message = "O nome deve ter entre 3 e 100 caracteres") String nome,
-			@NotBlank(message = "E-mail é obrigatório") @Email(message = "E-mail inválido") String email,
-			@NotBlank(message = "Senha não pode estar vazia") @Size(min = 8, message = "A senha deve ter pelo menos 8 caracteres") @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$", message = "A senha deve conter pelo menos uma letra maiúscula, uma minúscula e um número") String senha,
-			@NotBlank(message = "CPF é obrigatório") @Pattern(regexp = "\\d{11}", message = "CPF deve conter exatamente 11 dígitos") String cpf,
-			@Past(message = "Data de nascimento deve ser no passado") LocalDate dtNascimento, TipoUsuario tipo,
-			boolean ativo, List<Aposta> apostas) {
-		super();
+	// 🔹 Construtor completo
+	public Usuario(Long id, String nome, String email, String senha, String cpf, LocalDate dtNascimento,
+			TipoUsuario tipo, boolean ativo, List<Aposta> apostas) {
 		this.id = id;
 		this.nome = nome;
 		this.email = email;
@@ -130,8 +130,10 @@ public class Usuario implements Serializable {
 		this.tipo = tipo;
 		this.ativo = ativo;
 		this.apostas = apostas;
+		this.dataCadastro = LocalDate.now();
 	}
 
+	// 🔹 Getters e Setters
 	public Long getId() {
 		return id;
 	}
@@ -204,11 +206,8 @@ public class Usuario implements Serializable {
 		this.apostas = apostas;
 	}
 
-	@Override
-	public String toString() {
-		return "Usuario [id=" + id + ", nome=" + nome + ", email=" + email + ", senha=" + senha + ", cpf=" + cpf
-				+ ", dtNascimento=" + dtNascimento + ", tipo=" + tipo + ", ativo=" + ativo + ", apostas=" + apostas
-				+ "]";
+	public LocalDate getDataCadastro() {
+		return dataCadastro;
 	}
 
 	@Override
@@ -220,12 +219,9 @@ public class Usuario implements Serializable {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
+		if (obj == null || getClass() != obj.getClass())
 			return false;
 		Usuario other = (Usuario) obj;
 		return Objects.equals(id, other.id);
 	}
-
 }

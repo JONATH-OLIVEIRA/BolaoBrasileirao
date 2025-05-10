@@ -1,19 +1,13 @@
 package br.com.apostas.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 import br.com.apostas.enums.EscolhaAposta;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
+import br.com.apostas.enums.StatusAposta;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "apostas")
@@ -26,80 +20,111 @@ public class Aposta implements Serializable {
 
 	@ManyToOne
 	@JoinColumn(name = "usuario_id", nullable = false)
-	private Usuario usuario; // Quem fez a aposta
+	private Usuario usuario;
 
 	@ManyToOne
 	@JoinColumn(name = "partida_id", nullable = false)
-	private Partida partida; // Qual partida foi apostada
+	private Partida partida;
 
 	@Enumerated(EnumType.STRING)
-	@NotNull(message = "A escolha da aposta é obrigatória")
-	private EscolhaAposta escolha; // CASA, FORA, EMPATE
+	@Column(nullable = false)
+	private EscolhaAposta escolha;
 
-	private Integer pontuacao = 0; // Pontuação calculada após o resultado oficial da partida
+	@Column(nullable = false)
+	private Integer pontuacao = 0;
 
-	// Construtores
+	@Column(nullable = false, updatable = false)
+	private LocalDateTime dataCriacao;
+
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private StatusAposta status;
+
+	@Column(nullable = false)
+	private BigDecimal valorAposta;
+
+	@Column(nullable = false)
+	private String formaPagamento;
+
+	// 🔹 Construtor
 	public Aposta() {
+		this.dataCriacao = LocalDateTime.now();
+		this.status = StatusAposta.PENDENTE;
+		this.valorAposta = BigDecimal.valueOf(10.00);
 	}
 
-	public Aposta(Usuario usuario, Partida partida, EscolhaAposta escolha) {
+	public Aposta(Usuario usuario, Partida partida, EscolhaAposta escolha, String formaPagamento) {
 		this.usuario = usuario;
 		this.partida = partida;
 		this.escolha = escolha;
+		this.formaPagamento = formaPagamento;
+		this.valorAposta = BigDecimal.valueOf(10.00);
+		this.dataCriacao = LocalDateTime.now();
+		this.status = StatusAposta.PENDENTE;
 	}
 
-	// Método para atualizar a pontuação com base no resultado da partida
+	// 🔹 Método para calcular a pontuação após a partida ser finalizada
 	public void calcularPontuacao() {
 		if (this.partida.getResultado().name().equals(this.escolha.name())) {
-			if (this.escolha == EscolhaAposta.EMPATE) {
-				this.pontuacao = 1; // Empates valem apenas 1 ponto
-			} else {
-				this.pontuacao = 3; // Acertos normais valem 3 pontos
-			}
+			this.pontuacao = (this.escolha == EscolhaAposta.EMPATE) ? 1 : 3;
+			this.status = StatusAposta.CONFIRMADA;
 		} else {
-			this.pontuacao = 0; // Nenhum ponto se errar
+			this.pontuacao = 0;
+			this.status = StatusAposta.CANCELADA;
 		}
 	}
 
-	// Getters e Setters
+	// 🔹 Getters e Setters
 	public Long getId() {
 		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public Usuario getUsuario() {
 		return usuario;
 	}
 
-	public void setUsuario(Usuario usuario) {
-		this.usuario = usuario;
-	}
-
 	public Partida getPartida() {
 		return partida;
-	}
-
-	public void setPartida(Partida partida) {
-		this.partida = partida;
 	}
 
 	public EscolhaAposta getEscolha() {
 		return escolha;
 	}
 
-	public void setEscolha(EscolhaAposta escolha) {
-		this.escolha = escolha;
-	}
-
 	public Integer getPontuacao() {
 		return pontuacao;
 	}
 
-	public void setPontuacao(Integer pontuacao) {
-		this.pontuacao = pontuacao;
+	public LocalDateTime getDataCriacao() {
+		return dataCriacao;
+	}
+
+	public StatusAposta getStatus() {
+		return status;
+	}
+
+	public BigDecimal getValorAposta() {
+		return valorAposta;
+	}
+
+	public String getFormaPagamento() {
+		return formaPagamento;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
+	}
+
+	public void setPartida(Partida partida) {
+		this.partida = partida;
+	}
+
+	public void setEscolha(EscolhaAposta escolha) {
+		this.escolha = escolha;
+	}
+
+	public void setFormaPagamento(String formaPagamento) {
+		this.formaPagamento = formaPagamento;
 	}
 
 	@Override
@@ -115,11 +140,5 @@ public class Aposta implements Serializable {
 			return false;
 		Aposta other = (Aposta) obj;
 		return Objects.equals(id, other.id);
-	}
-
-	@Override
-	public String toString() {
-		return "Aposta [id=" + id + ", usuario=" + usuario.getNome() + ", partida=" + partida.getTimeCasa() + " vs "
-				+ partida.getTimeFora() + ", escolha=" + escolha + ", pontuacao=" + pontuacao + "]";
 	}
 }

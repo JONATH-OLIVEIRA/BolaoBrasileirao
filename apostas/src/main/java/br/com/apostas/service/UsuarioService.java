@@ -1,6 +1,8 @@
 package br.com.apostas.service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +13,6 @@ import org.springframework.stereotype.Service;
 import br.com.apostas.model.Usuario;
 import br.com.apostas.repository.UsuarioRepository;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.transaction.Transactional;
 
@@ -54,14 +55,14 @@ public class UsuarioService {
     }
 
     private String gerarTokenJwt(Usuario usuario) {
-        return Jwts.builder()
-                .setSubject(usuario.getEmail())
-                .claim("id", usuario.getId())
-                .claim("role", usuario.getTipo().name())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()), SignatureAlgorithm.HS256)
-                .compact();
+        return Jwts.builder() // 🔹 Nova abordagem usando BuilderFactory
+            .subject(usuario.getEmail())
+            .claim("id", usuario.getId())
+            .claim("role", usuario.getTipo().name())
+            .issuedAt(new Date())
+            .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
+            .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8))) // 🔹 Melhorando segurança da chave
+            .compact();
     }
 
     private void validarUsuario(Usuario usuario) {
@@ -82,6 +83,9 @@ public class UsuarioService {
 
     public Optional<Usuario> buscarPorId(Long id) {
         return usuarioRepository.findById(id);
+    }
+    public List<Usuario> listarTodos() {
+        return usuarioRepository.findAll();
     }
 
     @Transactional
