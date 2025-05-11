@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard do Administrador</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <h1>Dashboard do Administrador</h1>
+    <h2>Resumo do Sistema</h2>
+    <p>Total de Apostas: <span th:text="${dashboard.totalApostas}"></span></p>
+    <p>Total de Partidas: <span th:text="${dashboard.totalPartidas}"></span></p>
+    <p>Total de Usuários: <span th:text="${dashboard.totalUsuarios}"></span></p>
+    
+    <!-- Adicione o botão de logout se quiser -->
+    <form th:action="@{/auth/login}" method="post">
+        <button type="submit">Sair</button>
+    </form>
+</body>
+</html>

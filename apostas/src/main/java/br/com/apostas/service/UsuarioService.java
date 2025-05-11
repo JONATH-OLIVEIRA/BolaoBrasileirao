@@ -1,6 +1,5 @@
 package br.com.apostas.service;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Service;
 import br.com.apostas.model.Usuario;
 import br.com.apostas.repository.UsuarioRepository;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.transaction.Transactional;
 
@@ -61,7 +61,8 @@ public class UsuarioService {
             .claim("role", usuario.getTipo().name())
             .issuedAt(new Date())
             .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
-            .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8))) // 🔹 Melhorando segurança da chave
+            .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret))) // <-- aqui também decodifica base64
+ // 🔹 Melhorando segurança da chave
             .compact();
     }
 

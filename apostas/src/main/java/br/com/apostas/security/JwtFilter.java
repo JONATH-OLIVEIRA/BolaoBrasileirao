@@ -2,7 +2,8 @@ package br.com.apostas.security;
 
 import java.io.IOException;
 
-import org.springframework.http.HttpHeaders;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -15,6 +16,7 @@ import br.com.apostas.service.JwtTokenService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -22,62 +24,94 @@ import jakarta.servlet.http.HttpServletResponse;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtTokenService jwtTokenService;
+    private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
 
     public JwtFilter(JwtTokenService jwtTokenService) {
         this.jwtTokenService = jwtTokenService;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, 
-                                  FilterChain chain) throws ServletException, IOException {
-        
-        // 🔹 Permitir requisição para login sem exigir token
-        if (request.getServletPath().equals("/auth/login")) {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
+
+        logger.info("📌 JwtFilter ativado! Verificando requisição: {}", request.getServletPath());
+
+        // Rotas públicas
+        if (request.getServletPath().equals("/auth/login") || 
+            request.getServletPath().startsWith("/css/") ||
+            request.getServletPath().startsWith("/js/")) {
             chain.doFilter(request, response);
             return;
         }
 
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
-        // 🔹 Verifica se o cabeçalho Authorization está presente e no formato correto
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            chain.doFilter(request, response);
+        // Obter token de múltiplas fontes (Header ou Query Parameter)
+        String token = getTokenFromRequest(request);
+        
+        if (token == null) {
+            logger.warn("⚠️ Token JWT não encontrado em headers ou parâmetros");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token não fornecido");
             return;
         }
 
         try {
-            final String token = authHeader.substring(7); // Remove "Bearer " do início
+            logger.info("🔹 Token JWT encontrado: {}", token);
 
             if (!jwtTokenService.validarToken(token)) {
+                logger.error("❌ Token inválido ou expirado!");
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido ou expirado");
                 return;
             }
 
-            // 🔹 Extrai informações do token diretamente de `JwtTokenService`
-            final Claims claims = jwtTokenService.extrairClaims(token);
-            final String email = claims.getSubject();
-            final String role = claims.get("role", String.class);
+            Claims claims = jwtTokenService.extrairClaims(token);
+            String email = claims.getSubject();
+            String role = claims.get("role", String.class);
 
-            // 🔹 Cria `UserDetails` com as permissões adequadas
+            logger.info("🟢 Token válido! Usuário: {} | Role: {}", email, role);
+
             UserDetails userDetails = User.withUsername(email)
-                                       .password("") // Senha vazia pois já validamos o token
-                                       .roles(role)
-                                       .build();
+                    .password("")
+                    .roles(role)
+                    .build();
 
             UsernamePasswordAuthenticationToken authentication = 
-                new UsernamePasswordAuthenticationToken(
-                    userDetails, 
-                    null, 
-                    userDetails.getAuthorities()
-                );
-
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             chain.doFilter(request, response);
             
         } catch (Exception e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Erro na autenticação: " + e.getMessage());
+            logger.error("❌ Erro na autenticação JWT: {}", e.getMessage());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Erro de autenticação");
         }
+    }
+
+    // Novo método para extrair token de múltiplas fontes
+    private String getTokenFromRequest(HttpServletRequest request) {
+        // 1. Verificar cookies PRIMEIRO (mais importante)
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("token".equals(cookie.getName())) {
+                    logger.info("🔵 Token encontrado no cookie: " + cookie.getValue());
+                    return cookie.getValue();
+                }
+            }
+        }
+        
+        // 2. Verificar header Authorization (opcional)
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+        
+        // 3. Verificar parâmetro token (apenas para desenvolvimento)
+        String tokenParam = request.getParameter("token");
+        if (tokenParam != null && !tokenParam.isBlank()) {
+            return tokenParam;
+        }
+        
+        logger.warn("🔴 Nenhum token encontrado em cookies, headers ou parâmetros");
+        return null;
     }
 }

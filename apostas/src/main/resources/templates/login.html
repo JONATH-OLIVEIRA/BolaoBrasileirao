@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Login</title>
+<style>
+.error {
+	color: red;
+}
+</style>
+</head>
+<body>
+	<h1>Login</h1>
+
+	<!-- Mensagem de erro -->
+	<div th:if="${error}" class="error" th:text="${error}"></div>
+
+	<form id="loginForm">
+		<input type="email" id="email" required placeholder="Email"> <input
+			type="password" id="senha" required placeholder="Senha">
+		<button type="submit">Entrar</button>
+	</form>
+
+	<script>
+	document.getElementById('loginForm').addEventListener('submit', async (e) => {
+	    e.preventDefault();
+	    
+	    const response = await fetch('/auth/login', {
+	        method: 'POST',
+	        credentials: 'include', // CRUCIAL para cookies
+	        headers: {
+	            'Content-Type': 'application/x-www-form-urlencoded',
+	        },
+	        body: new URLSearchParams({
+	            email: document.getElementById('email').value,
+	            senha: document.getElementById('senha').value
+	        })
+	    });
+
+	    if (response.ok) {
+	        const data = await response.json();
+	        window.location.href = data.redirect; // Usa a URL do backend
+	    } else {
+	        const error = await response.text();
+	        window.location.href = '/auth/login?error=' + encodeURIComponent(error);
+	    }
+	});
+    </script>
+</body>
+</html>
