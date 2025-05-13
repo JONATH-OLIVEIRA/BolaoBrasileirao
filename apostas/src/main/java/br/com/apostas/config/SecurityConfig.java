@@ -37,27 +37,26 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling(exception -> exception
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/auth/**",
-                    "/login",
-                    "/favicon.ico",
-                    "/auth",
-                    "/auth/login", 
-                    "/v3/api-docs/**", 
-                    "/swagger-ui/**",
-                    "/css/**",
-                    "/js/**",
-                    "/images/**",
-                    "/webjars/**"
-                ).permitAll()
-                .requestMatchers("/admin/dashboard").authenticated() // Requer autenticação
-                .requestMatchers("/admin/**").hasRole("ADMIN") // Requer role ADMIN
-                .anyRequest().authenticated())
+                // 🔹 Permitir acesso público ao login e registro de usuários
+                .requestMatchers("/", "/index", "/auth/login", "/auth/cadastro", "/favicon.ico", "/v3/api-docs/**", "/swagger-ui/**", "/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
+              
+                // 🔹 Proteção do dashboard do administrador
+                .requestMatchers("/admin/dashboard").hasRole("ADMIN")
+                .requestMatchers("/admin/resumo").hasRole("ADMIN")
+                .requestMatchers("/admin/partidas").hasRole("ADMIN")
+                .requestMatchers("/admin/usuarios").hasRole("ADMIN")
+
+                // 🔹 Permitir acesso ao dashboard do usuário
+                .requestMatchers("/user/dashboard").hasRole("USER") 
+                .requestMatchers("/usuario/partidas-api/**").hasRole("USER") // 🔹 API de apostas
+                
+                // 🔹 Qualquer outra requisição exige autenticação
+                .anyRequest().authenticated()) 
+
+            // 🔹 Adiciona filtro JWT antes do processo de autenticação padrão do Spring
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -6,93 +6,39 @@
 
     <!-- Importação do Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 </head>
 <body class="bg-light">
 
-    <div class="container mt-4">
-        <h1 class="text-center mb-4">Dashboard do Administrador</h1>
-
-        <h2 class="mt-4">Resumo do Sistema</h2>
-        <div class="row">
-            <div class="col-md-4">
-                <p class="alert alert-primary">Total de Apostas: <span th:text="${dashboard.totalApostas}"></span></p>
-            </div>
-            <div class="col-md-4">
-                <p class="alert alert-success">Total de Partidas: <span th:text="${dashboard.totalPartidas}"></span></p>
-            </div>
-            <div class="col-md-4">
-                <p class="alert alert-warning">Total de Usuários: <span th:text="${dashboard.totalUsuarios}"></span></p>
+    <!-- Navbar de navegação -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Apostas Brasileirão</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/resumo">Resumo</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/partidas">Gerenciar Partidas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/usuarios">Gerenciar Usuários</a>
+                    </li>
+                </ul>
             </div>
         </div>
+    </nav>
 
-        <h2 class="mt-4">Cadastrar Nova Partida</h2>
-        <form id="cadastrarPartida" class="p-4 border bg-white rounded">
-            <div class="mb-3">
-                <label for="timeCasa" class="form-label">Time da Casa:</label>
-                <select id="timeCasa" name="timeCasa" class="form-select" required>
-                    <option th:each="time : ${timesBrasileirao}" th:value="${time}" th:text="${time}"></option>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label for="timeFora" class="form-label">Time Visitante:</label>
-                <select id="timeFora" name="timeFora" class="form-select" required>
-                    <option th:each="time : ${timesBrasileirao}" th:value="${time}" th:text="${time}"></option>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label for="dataJogo" class="form-label">Data do Jogo:</label>
-                <input type="date" id="dataJogo" name="dataJogo" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="rodada" class="form-label">Rodada:</label>
-                <input type="number" id="rodada" name="rodada" class="form-control" required min="1">
-            </div>
-
-            <button type="submit" class="btn btn-primary">Cadastrar Partida</button>
-        </form>
-
-        <h2 class="mt-4">Lista de Partidas Cadastradas</h2>
-        <table class="table table-striped table-bordered">
-            <thead class="table-dark">
-                <tr>
-                    <th>Time da Casa</th>
-                    <th>Time Visitante</th>
-                    <th>Data do Jogo</th>
-                    <th>Rodada</th>
-                    <th>Resultado</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="partida : ${partidas}" th:data-id="${partida.id}">
-                    <td th:text="${partida.timeCasa}"></td>
-                    <td th:text="${partida.timeFora}"></td>
-                    <td th:text="${#temporals.format(partida.dataJogo, 'dd-MM-yyyy')}"></td>
-                    <td th:text="${partida.rodada}"></td>
-                    <td th:text="${partida.resultado}" class="resultado"></td>
-                    <td>
-                        <button th:attr="onclick='excluirPartida(' + ${partida.id} + ')'" class="btn btn-danger btn-sm">Excluir</button>
-
-                        <select th:id="'resultadoFinal_' + ${partida.id}" th:data-id="${partida.id}" class="form-select form-select-sm">
-                            <option value="CASA">Vitória Casa</option>
-                            <option value="FORA">Vitória Fora</option>
-                            <option value="EMPATE">Empate</option>
-                        </select>
-                        <button th:attr="onclick='finalizarPartida(' + ${partida.id} + ', document.getElementById(\'resultadoFinal_' + ${partida.id} + '\').value)'" class="btn btn-success btn-sm">Finalizar</button>
-
-                        <button th:attr="onclick='corrigirResultado(' + ${partida.id} + ')'" class="btn btn-warning btn-sm">Corrigir Resultado</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- Conteúdo do Dashboard -->
+    <div class="container mt-4">
+        <h1 class="text-center">Bem-vindo ao Dashboard</h1>
+        <p class="text-center">Use o menu acima para acessar as seções.</p>
     </div>
 
     <script src="/js/main.js"></script>
-    <script src="/js/ajax.js"></script>
 </body>
 </html>

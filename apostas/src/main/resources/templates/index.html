@@ -12,12 +12,17 @@
 </head>
 <body>
 
-    <div class="home-container">
+    <div class="home-container container-fluid vh-100 d-flex align-items-center justify-content-center">
         <div class="overlay"></div>
         <div class="content text-center">
             <h1 class="display-3 text-white">Bem-vindo ao Sistema de Apostas do Brasileirão!</h1>
             <p class="lead text-white">Gerencie suas apostas, visualize partidas e acompanhe os resultados.</p>
-            <a href="/auth/login" class="btn btn-lg btn-warning">Login</a>
+            
+            <!-- Botões estilizados com tamanhos iguais -->
+            <div class="d-flex gap-3 justify-content-center">
+                <a href="/auth/login" class="btn btn-lg btn-warning px-4 py-2 shadow">Login</a>
+                <a href="/auth/cadastro" class="btn btn-lg btn-primary px-4 py-2 shadow">Cadastrar-se</a>
+            </div>
         </div>
     </div>
 

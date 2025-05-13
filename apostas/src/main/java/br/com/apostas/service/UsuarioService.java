@@ -2,6 +2,7 @@ package br.com.apostas.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +38,15 @@ public class UsuarioService {
 
     @Transactional
     public Usuario cadastrarUsuario(Usuario usuario) {
+        System.out.println("Senha recebida: " + usuario.getSenha()); // Debug
+        System.out.println("Senha válida? " + usuario.getSenha().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$")); // Debug
+        
         validarUsuario(usuario);
         usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
-        usuario.setAtivo(true);
         return usuarioRepository.save(usuario);
     }
-
-    public String autenticarUsuario(String email, String senha) {
+    
+    public Map<String, String> autenticarUsuario(String email, String senha) {
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
 
@@ -51,7 +54,12 @@ public class UsuarioService {
             throw new RuntimeException("Credenciais inválidas!");
         }
 
-        return gerarTokenJwt(usuario);
+        String token = gerarTokenJwt(usuario);
+        String role = usuario.getTipo().name(); // Supondo que role seja um ENUM
+        String userId = usuario.getId().toString();
+
+        // Retornar um Map com token e role
+        return Map.of("token", token, "role", role,"id", userId);
     }
 
     private String gerarTokenJwt(Usuario usuario) {

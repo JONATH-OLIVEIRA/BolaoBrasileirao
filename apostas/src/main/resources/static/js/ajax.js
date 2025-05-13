@@ -10,7 +10,7 @@ async function cadastrarPartida(event) {
     };
 
     const token = localStorage.getItem("token");
-    const response = await fetch("/admin/partidas", {
+    const response = await fetch("/admin/partidas-api", { // 🔹 Caminho atualizado
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -34,15 +34,13 @@ async function excluirPartida(partidaId) {
     console.log(`✅ Excluir partida acionado! ID: ${partidaId}`);
 
     const token = localStorage.getItem("token");
-    const response = await fetch(`/admin/partidas/${partidaId}`, {
+    const response = await fetch(`/admin/partidas-api/${partidaId}`, { // 🔹 Caminho atualizado
         method: "DELETE",
         headers: { "Authorization": "Bearer " + token }
     });
 
     if (response.ok) {
         alert("✅ Partida excluída com sucesso!");
-
-        // Atualizando a página para refletir as mudanças
         location.reload();
     } else {
         alert("❌ Erro ao excluir partida!");
@@ -55,25 +53,18 @@ async function finalizarPartida(partidaId, resultado) {
 
     const token = localStorage.getItem("token");
 
-    const response = await fetch(`/admin/partidas/${partidaId}/finalizar`, {
+    const response = await fetch(`/admin/partidas-api/${partidaId}/finalizar`, { // 🔹 Caminho atualizado
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
             "Authorization": "Bearer " + token
         },
-        body: JSON.stringify(resultado)
+        body: JSON.stringify({ resultado })
     });
 
     if (response.ok) {
         alert("✅ Partida finalizada com sucesso!");
-
-        // Atualizando o resultado na tabela dinamicamente
-        const resultadoCell = document.querySelector(`tr[data-id='${partidaId}'] td.resultado`);
-        if (resultadoCell) {
-            resultadoCell.innerText = resultado;
-        } else {
-            console.error("❌ Elemento do resultado não encontrado.");
-        }
+        location.reload();
     } else {
         alert("❌ Erro ao finalizar partida!");
         console.log(await response.text());
@@ -95,7 +86,7 @@ async function corrigirResultado(partidaId) {
     console.log(`Partida ID: ${partidaId}, Novo Resultado: ${novoResultado}, Justificativa: ${justificativa}`);
 
     try {
-        const response = await fetch(`/admin/partidas/${partidaId}/corrigir-resultado`, {
+        const response = await fetch(`/admin/partidas-api/${partidaId}/corrigir-resultado`, { // 🔹 Caminho atualizado
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -106,17 +97,6 @@ async function corrigirResultado(partidaId) {
 
         if (response.ok) {
             alert("✅ Resultado corrigido com sucesso!");
-
-            // Atualizando o resultado dinamicamente na tabela antes de recarregar
-            const resultadoCell = document.querySelector(`tr[data-id="${partidaId}"] td.resultado`);
-            if (resultadoCell) {
-                resultadoCell.innerText = novoResultado;
-                console.log(`✅ Resultado atualizado na tabela: ${novoResultado}`);
-            } else {
-                console.error("❌ Elemento do resultado não encontrado.");
-            }
-
-            // Recarregar a página após a atualização
             setTimeout(() => {
                 location.reload();
             }, 1000);

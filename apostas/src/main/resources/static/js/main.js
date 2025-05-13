@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("cadastrarPartida").addEventListener("submit", cadastrarPartida);
 });

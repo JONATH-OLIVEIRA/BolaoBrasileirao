@@ -21,7 +21,7 @@ import br.com.apostas.model.Partida;
 import br.com.apostas.service.PartidaService;
 
 @RestController
-@RequestMapping("/admin/partidas")
+@RequestMapping("/admin/partidas-api")
 @PreAuthorize("hasRole('ADMIN')")
 public class PartidaAdminController {
 

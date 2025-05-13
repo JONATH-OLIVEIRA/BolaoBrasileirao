@@ -32,7 +32,7 @@ public class UsuarioController {
     @PostMapping
     @Operation(summary = "Criar um novo usuário", description = "Registra um novo usuário no sistema com perfil de apostador.")
     public ResponseEntity<Usuario> cadastrarUsuario(@RequestBody Usuario usuario) {
-        usuario.setTipo(TipoUsuario.USUARIO);
+        usuario.setTipo(TipoUsuario.USER);
         Usuario novoUsuario = usuarioService.cadastrarUsuario(usuario);
         return ResponseEntity.ok(novoUsuario);
     }

@@ -16,7 +16,7 @@ import br.com.apostas.model.Usuario;
 import br.com.apostas.service.PartidaUsuarioService;
 
 @RestController
-@RequestMapping("/usuario/partidas")
+@RequestMapping("/usuario/partidas-api")
 public class PartidaUsuarioController {
 
     private final PartidaUsuarioService partidaUsuarioService;

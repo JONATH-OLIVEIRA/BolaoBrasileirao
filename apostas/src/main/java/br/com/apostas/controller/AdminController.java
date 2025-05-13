@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/admin/usuarios")
+@RequestMapping("/admin/usuarios-api")
 @Tag(name = "Admin - Usuários", description = "Gerenciamento de usuários pelo administrador")
 @PreAuthorize("hasRole('ADMIN')") // 🔹 Apenas administradores podem acessar este controlador
 public class AdminController {

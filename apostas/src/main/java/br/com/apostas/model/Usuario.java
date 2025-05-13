@@ -49,7 +49,10 @@ public class Usuario implements Serializable {
 
 	@NotBlank(message = "Senha não pode estar vazia")
 	@Size(min = 8, message = "A senha deve ter pelo menos 8 caracteres")
-	@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$", message = "A senha deve conter pelo menos uma letra maiúscula, uma minúscula e um número")
+	@Pattern(
+		    regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$", 
+		    message = "A senha deve conter pelo menos 1 letra maiúscula, 1 minúscula e 1 número"
+		)
 	private String senha;
 
 	@NotBlank(message = "CPF é obrigatório")

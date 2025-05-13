@@ -10,7 +10,7 @@ import br.com.apostas.dto.DashboardResumoDTO;
 import br.com.apostas.service.AdminDashboardService;
 
 @RestController
-@RequestMapping("/admin/dashboard")
+@RequestMapping("/admin/dashboard-api")
 @PreAuthorize("hasRole('ADMIN')") // 🔒 Apenas administradores podem acessar este controlador
 public class AdminDashboardController {
 
