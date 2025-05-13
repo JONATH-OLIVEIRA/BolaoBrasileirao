@@ -15,28 +15,32 @@ import br.com.apostas.service.PartidaService;
 @Controller
 public class FrontAuthController {
 
-    private final AdminDashboardService adminDashboardService;
-    private final PartidaService partidaService;
+	private final AdminDashboardService adminDashboardService;
+	private final PartidaService partidaService;
 
+	// 🔹 Injeção do serviço pelo construtor
+	public FrontAuthController(AdminDashboardService adminDashboardService, PartidaService partidaService) {
+		this.adminDashboardService = adminDashboardService;
+		this.partidaService = partidaService;
+	}
 
-    // 🔹 Injeção do serviço pelo construtor
-    public FrontAuthController(AdminDashboardService adminDashboardService, PartidaService partidaService) {
-        this.adminDashboardService = adminDashboardService;
-        this.partidaService = partidaService;
-    }
+	@GetMapping("/") // 🔹 Define a Home como página inicial
+	public String homePage() {
+		return "index"; // Carrega home.html
+	}
 
-    @GetMapping("/auth/login")
-    public String loginPage() {
-        return "login";
-    }
+	@GetMapping("/auth/login")
+	public String loginPage() {
+		return "login";
+	}
 
-    @GetMapping("/dashboard-summary")
-    public String dashboard(Model model) {
-        DashboardResumoDTO resumo = adminDashboardService.getResumoDashboard();
-        List<Partida> partidas = partidaService.listarTodas();
-        model.addAttribute("dashboard", resumo);
-        model.addAttribute("partidas", partidas);
-        model.addAttribute("timesBrasileirao", TimesBrasileirao.values());
-        return "dashboard";
-    }
+	@GetMapping("/dashboard-summary")
+	public String dashboard(Model model) {
+		DashboardResumoDTO resumo = adminDashboardService.getResumoDashboard();
+		List<Partida> partidas = partidaService.listarTodas();
+		model.addAttribute("dashboard", resumo);
+		model.addAttribute("partidas", partidas);
+		model.addAttribute("timesBrasileirao", TimesBrasileirao.values());
+		return "dashboard";
+	}
 }
