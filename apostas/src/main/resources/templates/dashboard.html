@@ -6,15 +6,70 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
+
     <h1>Dashboard do Administrador</h1>
     <h2>Resumo do Sistema</h2>
     <p>Total de Apostas: <span th:text="${dashboard.totalApostas}"></span></p>
     <p>Total de Partidas: <span th:text="${dashboard.totalPartidas}"></span></p>
     <p>Total de Usuários: <span th:text="${dashboard.totalUsuarios}"></span></p>
-    
-    <!-- Adicione o botão de logout se quiser -->
-    <form th:action="@{/auth/login}" method="post">
-        <button type="submit">Sair</button>
+
+    <h2>Cadastrar Nova Partida</h2>
+    <form id="cadastrarPartida">
+        <label for="timeCasa">Time da Casa:</label>
+        <select id="timeCasa" name="timeCasa" required>
+            <option th:each="time : ${timesBrasileirao}" th:value="${time}" th:text="${time}"></option>
+        </select>
+
+        <label for="timeFora">Time Visitante:</label>
+        <select id="timeFora" name="timeFora" required>
+            <option th:each="time : ${timesBrasileirao}" th:value="${time}" th:text="${time}"></option>
+        </select>
+
+        <label for="dataJogo">Data do Jogo:</label>
+        <input type="date" id="dataJogo" name="dataJogo" required>
+
+        <label for="rodada">Rodada:</label>
+        <input type="number" id="rodada" name="rodada" required min="1">
+
+        <button type="submit">Cadastrar Partida</button>
     </form>
+
+    <h2>Lista de Partidas Cadastradas</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Time da Casa</th>
+                <th>Time Visitante</th>
+                <th>Data do Jogo</th>
+                <th>Rodada</th>
+                <th>Resultado</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="partida : ${partidas}">
+                <td th:text="${partida.timeCasa}"></td>
+                <td th:text="${partida.timeFora}"></td>
+                <td th:text="${partida.dataJogo}"></td>
+                <td th:text="${partida.rodada}"></td>
+                <td th:text="${partida.resultado}"></td>
+                <td>
+                    <button th:attr="onclick='excluirPartida(' + ${partida.id} + ')'" >Excluir</button>
+                    
+                    <select th:id="'resultadoFinal_' + ${partida.id}" th:data-id="${partida.id}">
+                        <option value="CASA">Vitória Casa</option>
+                        <option value="FORA">Vitória Fora</option>
+                        <option value="EMPATE">Empate</option>
+                    </select>
+                    <button th:attr="onclick='finalizarPartida(' + ${partida.id} + ', document.getElementById(\'resultadoFinal_' + ${partida.id} + '\').value)'" >Finalizar</button>
+                    
+                    <button th:attr="onclick='corrigirResultado(' + ${partida.id} + ')'" >Corrigir Resultado</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/ajax.js"></script>
 </body>
 </html>

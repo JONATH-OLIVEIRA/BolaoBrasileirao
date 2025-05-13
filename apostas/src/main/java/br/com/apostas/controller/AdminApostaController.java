@@ -50,4 +50,5 @@ public class AdminApostaController {
     public ResponseEntity<List<Aposta>> listarApostasPorStatus(@PathVariable String status) {
         return ResponseEntity.ok(apostaService.listarApostasPorStatus(status));
     }
+    
 }

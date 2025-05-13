@@ -20,4 +20,6 @@ public interface PartidaRepository extends JpaRepository<Partida, Long> {
 
     // 🔹 Buscar partidas de um time específico (Casa ou Fora)
     List<Partida> findByTimeCasaOrTimeFora(TimesBrasileirao timeCasa, TimesBrasileirao timeFora);
+    
+    List<Partida> findByResultadoIsNull();
 }

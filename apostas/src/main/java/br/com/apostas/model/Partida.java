@@ -1,13 +1,12 @@
 package br.com.apostas.model;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-
 import br.com.apostas.enums.ResultadoPartida;
 import br.com.apostas.enums.TimesBrasileirao;
 
@@ -35,24 +34,29 @@ public class Partida implements Serializable {
 
     @Column(nullable = false)
     @NotNull
-    private LocalDateTime dataJogo;
+    private LocalDate dataJogo;
+
+    @Column(nullable = false)
+    @NotNull(message = "A rodada da partida é obrigatória")
+    private Integer rodada;
 
     @OneToMany(mappedBy = "partida", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Aposta> apostas;
 
     public Partida() {}
 
-    public Partida(TimesBrasileirao timeCasa, TimesBrasileirao timeFora, LocalDateTime dataJogo) {
+    public Partida(TimesBrasileirao timeCasa, TimesBrasileirao timeFora, LocalDate dataJogo, Integer rodada) {
         if (timeCasa == timeFora) {
             throw new IllegalArgumentException("Os times da partida devem ser diferentes!");
         }
         this.timeCasa = timeCasa;
         this.timeFora = timeFora;
         this.dataJogo = validarDataJogo(dataJogo);
+        setRodada(rodada); // Rodada digitada pelo usuário
     }
 
-    private LocalDateTime validarDataJogo(LocalDateTime data) {
-        if (data.isBefore(LocalDateTime.now())) {
+    private LocalDate validarDataJogo(LocalDate data) {
+        if (data.isBefore(LocalDate.now())) {
             throw new IllegalArgumentException("A data da partida não pode estar no passado!");
         }
         return data;
@@ -69,17 +73,29 @@ public class Partida implements Serializable {
         }
     }
 
-    // 🔹 Getters e Setters
+    // Getters e Setters
+    public void setResultado(ResultadoPartida resultado) { 
+        this.resultado = resultado; 
+    }
+
+    public void setRodada(Integer rodada) {
+        if (rodada == null || rodada < 1) {
+            throw new IllegalArgumentException("❌ Rodada inválida! Deve ser um número maior que 0.");
+        }
+        this.rodada = rodada;
+    }
+
     public Long getId() { return id; }
     public TimesBrasileirao getTimeCasa() { return timeCasa; }
     public TimesBrasileirao getTimeFora() { return timeFora; }
     public ResultadoPartida getResultado() { return resultado; }
-    public LocalDateTime getDataJogo() { return dataJogo; }
+    public LocalDate getDataJogo() { return dataJogo; }
+    public Integer getRodada() { return rodada; }
     public List<Aposta> getApostas() { return apostas; }
 
     public void setTimeCasa(TimesBrasileirao timeCasa) { this.timeCasa = timeCasa; }
     public void setTimeFora(TimesBrasileirao timeFora) { this.timeFora = timeFora; }
-    public void setDataJogo(LocalDateTime dataJogo) { this.dataJogo = validarDataJogo(dataJogo); }
+    public void setDataJogo(LocalDate dataJogo) { this.dataJogo = validarDataJogo(dataJogo); }
     public void setApostas(List<Aposta> apostas) { this.apostas = apostas; }
 
     @Override
@@ -96,7 +112,7 @@ public class Partida implements Serializable {
 
     @Override
     public String toString() {
-        return "Partida [id=" + id + ", timeCasa=" + timeCasa + ", timeFora=" + timeFora +
-                ", resultado=" + resultado + ", dataJogo=" + dataJogo + "]";
+        return "Partida [id=" + id + ", timeCasa=" + timeCasa + ", timeFora=" + timeFora + 
+               ", resultado=" + resultado + ", dataJogo=" + dataJogo + ", rodada=" + rodada + "]";
     }
 }

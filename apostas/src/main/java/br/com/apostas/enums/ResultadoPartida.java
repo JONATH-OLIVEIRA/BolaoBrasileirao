@@ -4,5 +4,5 @@ public enum ResultadoPartida {
 	CASA,
 	FORA,
 	EMPATE,
-	PENDENTE
+	PENDENTE,
 }
