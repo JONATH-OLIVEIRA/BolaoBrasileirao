@@ -1,0 +1,11 @@
+.loading-spinner {
+	display: none;
+	text-align: center;
+	margin: 20px 0;
+}
+
+.error-message {
+	display: none;
+	color: red;
+	margin: 20px 0;
+}

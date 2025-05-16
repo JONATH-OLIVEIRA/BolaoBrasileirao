@@ -8,17 +8,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import br.com.apostas.enums.ResultadoPartida;
+import br.com.apostas.model.Aposta;
 import br.com.apostas.model.Partida;
+import br.com.apostas.repository.ApostaRepository;
 import br.com.apostas.repository.PartidaRepository;
 
 @Service
 public class PartidaService {
 
     private final PartidaRepository partidaRepository;
+    private final ApostaRepository apostaRepository;
+    
     private static final Logger logger = LoggerFactory.getLogger(PartidaService.class);
 
-    public PartidaService(PartidaRepository partidaRepository) {
+    public PartidaService(ApostaRepository apostaRepository,PartidaRepository partidaRepository) {
         this.partidaRepository = partidaRepository;
+        this.apostaRepository = apostaRepository;
     }
 
     // 🔹 Criar uma nova partida (APENAS ADMIN)
@@ -76,8 +81,18 @@ public class PartidaService {
 
         partida.setResultado(resultado);
         partidaRepository.save(partida);
-    }
 
+        // 🔹 Atualizar pontuação das apostas relacionadas à partida
+        List<Aposta> apostas = apostaRepository.findByPartida(partida);
+        System.out.println("🔹 Apostas encontradas para partida ID " + id + ": " + apostas);
+        for (Aposta aposta : apostas) {
+            aposta.calcularPontuacao(); // 🏆 Aplica a pontuação
+            apostaRepository.save(aposta); // 🔹 Atualiza no banco
+        }
+
+        System.out.println("✅ Pontuações calculadas para todas as apostas da partida " + id);
+    }
+    
     // 🔹 Remover uma partida (APENAS ADMIN)
     public void removerPartida(Long id) {
         Partida partida = buscarPorId(id);

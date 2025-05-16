@@ -5,10 +5,21 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import br.com.apostas.enums.ResultadoPartida;
 import br.com.apostas.enums.TimesBrasileirao;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "partidas")
@@ -27,6 +38,7 @@ public class Partida implements Serializable {
     @NotNull(message = "Time visitante é obrigatório")
     private TimesBrasileirao timeFora;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     @Enumerated(EnumType.STRING)
     @NotNull
     @Column(nullable = false)

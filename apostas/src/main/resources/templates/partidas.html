@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Gerenciamento de Partidas</title>
 
-    <!-- Importação do Bootstrap -->
+    <!-- Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 </head>
@@ -59,12 +59,17 @@
                     <td th:text="${partida.resultado}" class="resultado"></td>
                     <td>
                         <button th:attr="onclick='excluirPartida(' + ${partida.id} + ')'" class="btn btn-danger btn-sm">Excluir</button>
-                        <select th:id="'resultadoFinal_' + ${partida.id}" th:data-id="${partida.id}" class="form-select form-select-sm">
+
+                        <!-- Resultado Final -->
+                        <select th:id="'resultadoFinal_' + ${partida.id}" th:data-id="${partida.id}" class="form-select form-select-sm my-1">
                             <option value="CASA">Vitória Casa</option>
                             <option value="FORA">Vitória Fora</option>
                             <option value="EMPATE">Empate</option>
                         </select>
+
+                        <!-- Botão Finalizar com valor dinâmico -->
                         <button th:attr="onclick='finalizarPartida(' + ${partida.id} + ', document.getElementById(\'resultadoFinal_' + ${partida.id} + '\').value)'" class="btn btn-success btn-sm">Finalizar</button>
+
                         <button th:attr="onclick='corrigirResultado(' + ${partida.id} + ')'" class="btn btn-warning btn-sm">Corrigir Resultado</button>
                     </td>
                 </tr>
@@ -73,7 +78,7 @@
     </div>
 
     <script src="/js/partidas.js"></script>
-     <script src="/js/ajax.js"></script>
-      <script src="/js/main.js"></script>
+    <script src="/js/ajax.js"></script>
+    <script src="/js/main.js"></script>
 </body>
 </html>

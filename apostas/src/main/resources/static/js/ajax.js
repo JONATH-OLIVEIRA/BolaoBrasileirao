@@ -49,28 +49,54 @@ async function excluirPartida(partidaId) {
 }
 
 async function finalizarPartida(partidaId, resultado) {
-    console.log("✅ Finalizar partida acionado!");
+    if (!resultado) {
+        alert("Por favor, selecione um resultado antes de finalizar.");
+        return;
+    }
+
+    console.log("Finalizando partida:", { partidaId, resultado });
 
     const token = localStorage.getItem("token");
 
-    const response = await fetch(`/admin/partidas-api/${partidaId}/finalizar`, { // 🔹 Caminho atualizado
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + token
-        },
-        body: JSON.stringify({ resultado })
-    });
+    if (!token) {
+        alert("Sessão expirada. Redirecionando para login...");
+        window.location.href = "/auth/login";
+        return;
+    }
 
-    if (response.ok) {
-        alert("✅ Partida finalizada com sucesso!");
+    try {
+        const response = await fetch(`/admin/partidas-api/${partidaId}/finalizar`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(resultado.toUpperCase()) // ✅ apenas string, não objeto
+        });
+
+        if (response.status === 401) {
+            localStorage.removeItem("token");
+            throw new Error("Sessão expirada. Faça login novamente.");
+        }
+
+        const responseData = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+            throw new Error(responseData.message || `Erro ${response.status}`);
+        }
+
+        alert("Partida finalizada com sucesso!");
         location.reload();
-    } else {
-        alert("❌ Erro ao finalizar partida!");
-        console.log(await response.text());
+
+    } catch (error) {
+        console.error("Erro na finalização:", error);
+        alert(error.message);
+
+        if (error.message.includes("Sessão expirada")) {
+            window.location.href = "/auth/login";
+        }
     }
 }
-
 async function corrigirResultado(partidaId) {
     console.log("✅ Correção de resultado acionada!");
 

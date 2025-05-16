@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import br.com.apostas.enums.ResultadoPartida;
 import br.com.apostas.enums.StatusAposta;
 import br.com.apostas.model.Aposta;
 import br.com.apostas.model.Partida;
@@ -22,12 +23,13 @@ public class ApostaService {
 
     // 🔹 Registrar nova aposta
     public Aposta registrarAposta(Aposta aposta) {
-        if (aposta.getPartida().getResultado() != null) {
-            throw new IllegalArgumentException("Não é possível apostar em uma partida já finalizada!");
+        if (aposta.getPartida().getResultado() != ResultadoPartida.PENDENTE) {
+            throw new IllegalArgumentException("❌ Não é possível apostar em uma partida já finalizada!");
         }
 
         return apostaRepository.save(aposta);
     }
+
 
     // 🔹 Buscar todas as apostas de um usuário
     public List<Aposta> listarApostasPorUsuario(Usuario usuario) {

@@ -11,13 +11,19 @@ import br.com.apostas.model.Usuario;
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
-    Optional<Usuario> findByEmail(String email);
+	Optional<Usuario> findByEmail(String email);
 
-    Optional<Usuario> findByCpf(String cpf);
+	Optional<Usuario> findByCpf(String cpf);
 
-    boolean existsByEmail(String email);
+	boolean existsByEmail(String email);
 
-    boolean existsByCpf(String cpf);
+	boolean existsByCpf(String cpf);
 
-    List<Usuario> findByAtivoTrue(); // Retorna apenas usuários ativos
+	List<Usuario> findByAtivoTrue(); // Retorna apenas usuários ativos
+
+	long countByAtivoTrue();
+
+	// 🔹 Contar usuários inativos
+	long countByAtivoFalse();
+
 }

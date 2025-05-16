@@ -42,13 +42,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         } else {
             // 🔹 Popula tabela
             apostas.forEach(aposta => {
-                const row = tabelaApostas.insertRow();
-                row.innerHTML = `
-                    <td>${aposta.partida.timeCasa} vs ${aposta.partida.timeFora}</td>
-                    <td>${new Date(aposta.partida.dataJogo).toLocaleDateString('pt-BR')}</td>
-                    <td>${aposta.resultadoEscolhido}</td>
-                    <td>${aposta.partida.resultado || 'Aguardando'}</td>
-                `;
+               const row = tabelaApostas.insertRow();
+			   row.innerHTML = `
+			    <td>${aposta.partida.timeCasa} vs ${aposta.partida.timeFora}</td>
+			    <td>${new Date(aposta.partida.dataJogo).toLocaleDateString('pt-BR')}</td>
+			    <td>${aposta.resultadoEscolhido}</td>
+			    <td>${aposta.valor !== undefined ? aposta.valor : '-'}</td>
+			    <td>${aposta.partida.resultado || 'Aguardando'}</td>
+			    <td>${aposta.pontuacao !== undefined ? aposta.pontuacao : '-'}</td>
+			`;
             });
 
             tabelaApostas.style.display = 'table';

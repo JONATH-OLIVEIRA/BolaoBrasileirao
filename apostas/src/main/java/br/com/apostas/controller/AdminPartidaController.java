@@ -2,7 +2,9 @@ package br.com.apostas.controller;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,11 +25,11 @@ import br.com.apostas.service.PartidaService;
 @RestController
 @RequestMapping("/admin/partidas-api")
 @PreAuthorize("hasRole('ADMIN')")
-public class PartidaAdminController {
+public class AdminPartidaController {
 
     private final PartidaService partidaService;
 
-    public PartidaAdminController(PartidaService partidaService) {
+    public AdminPartidaController(PartidaService partidaService) {
         this.partidaService = partidaService;
     }
   
@@ -57,9 +59,15 @@ public class PartidaAdminController {
 
     // 🔹 Finalizar uma partida e definir o resultado (APENAS ADMIN)
     @PutMapping("/{id}/finalizar")
-    public ResponseEntity<Void> finalizarPartida(@PathVariable Long id, @RequestBody ResultadoPartida resultado) {
-        partidaService.finalizarPartida(id, resultado);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Map<String, Object>> finalizarPartida(@PathVariable Long id, @RequestBody ResultadoPartida resultado) {
+        partidaService.finalizarPartida(id, resultado); // 🔹 Apenas chama o serviço, que já faz toda a atualização
+
+        // 🔹 Monta a resposta com status atualizado
+        Map<String, Object> response = new HashMap<>();
+        response.put("mensagem", "✅ Partida finalizada e pontuação calculada!");
+        response.put("resultado", resultado);
+
+        return ResponseEntity.ok(response);
     }
 
 

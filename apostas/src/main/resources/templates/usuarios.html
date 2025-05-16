@@ -1,4 +1,89 @@
-<div class="container mt-4">
-    <h2>Gerenciamento de Usu�rios</h2>
-    <p>Em breve ser� implementado...</p>
-</div>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciamento de Usuários</title>
+
+    <!-- Bootstrap via CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet">
+</head>
+<body class="bg-light" onload="carregarUsuarios()">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Apostas Brasileirão</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/partidas">Gerenciar Partidas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin/usuarios">Gerenciar Usuários</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Conteúdo da página -->
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Gerenciamento de Usuários</h1>
+
+        <!-- Tabela de usuários -->
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Papel</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="usuarios-tabela">
+                <tr th:each="usuario : ${usuarios}" th:data-id="${usuario.id}">
+                    <td th:text="${usuario.nome}"></td>
+                    <td th:text="${usuario.email}"></td>
+                    <td>
+                        <span th:text="${usuario.ativo ? 'Ativo' : 'Inativo'}"></span>
+                    </td>
+                    <td>
+                        <select th:id="'role_' + ${usuario.id}" th:data-id="${usuario.id}" class="form-select form-select-sm">
+                            <option value="USER" th:selected="${usuario.tipo == 'USER'}">Usuário</option>
+                            <option value="ADMIN" th:selected="${usuario.tipo == 'ADMIN'}">Admin</option>
+                        </select>
+                    </td>
+                    <td>
+                        <!-- Botão de ativar/desativar -->
+                        <button th:if="!${usuario.ativo}" th:attr="onclick='ativarUsuario(' + ${usuario.id} + ')'"
+                            class="btn btn-success btn-sm">Ativar</button>
+                        <button th:if="${usuario.ativo}" th:attr="onclick='desativarUsuario(' + ${usuario.id} + ')'"
+                            class="btn btn-danger btn-sm">Desativar</button>
+
+                        <!-- Botão para salvar mudanças de permissão -->
+                        <button th:attr="onclick='alterarPermissaoUsuario(' + ${usuario.id} + ', document.getElementById(\'role_' + ${usuario.id} + '\').value)'"
+                            class="btn btn-warning btn-sm">Salvar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Alerta de erro (caso a API falhe) -->
+        <div id="erro-usuarios" class="alert alert-danger d-none">
+            ❌ Erro ao carregar usuários! Tente novamente mais tarde.
+        </div>
+    </div>
+
+    <!-- Bootstrap JS e scripts AJAX -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/usuario.js"></script>
+</body>
+</html>

@@ -22,4 +22,6 @@ public interface PartidaRepository extends JpaRepository<Partida, Long> {
     List<Partida> findByTimeCasaOrTimeFora(TimesBrasileirao timeCasa, TimesBrasileirao timeFora);
     
     List<Partida> findByResultadoIsNull();
+    
+       
 }

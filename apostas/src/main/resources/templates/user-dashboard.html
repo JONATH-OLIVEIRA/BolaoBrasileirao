@@ -5,41 +5,48 @@
     <title>Dashboard do Usuário</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" th:href="@{/css/user-dashboard.css}">
+    
 </head>
 <body class="bg-light">
-
     <div class="container mt-4">
         <h1 class="text-center">Dashboard do Usuário</h1>
 
         <!-- Menu de Navegação -->
         <nav class="nav nav-tabs">
-            <a class="nav-link active" href="#">Minhas Apostas</a>
+            <a class="nav-link active" href="/user/user-dashboard">Minhas Apostas</a>
             <a class="nav-link" href="/user/apostar">Fazer Aposta</a>
             <a class="nav-link" href="/">Sair</a>
         </nav>
 
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p>Carregando suas apostas...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="error-container" class="alert alert-danger error-message" role="alert"></div>
+
         <h2 class="mt-4">Minhas Apostas</h2>
-        <table class="table table-striped">
+        <table class="table table-striped" id="tabelaApostas">
             <thead>
                 <tr>
                     <th>Partida</th>
                     <th>Data</th>
                     <th>Minha Escolha</th>
+                    <th>Valor</th>
                     <th>Resultado</th>
+                    <th>Pontuação</th>
                 </tr>
             </thead>
-            <tbody id="tabelaApostas">
-                <tr th:each="aposta : ${apostas}" th:data-id="${aposta.id}">
-                    <td th:text="${aposta.partida.timeCasa + ' vs ' + aposta.partida.timeFora}"></td>
-                    <td th:text="${#temporals.format(aposta.partida.dataJogo, 'dd/MM/yyyy')}"></td>
-                    <td th:text="${aposta.escolha}"></td>
-                    <td th:text="${aposta.partida.resultado ?: 'Aguardando'}"></td>
-                </tr>
+            <tbody id="apostas-body">
+                <!-- As apostas serão inseridas aqui via JavaScript -->
             </tbody>
         </table>
-
-        <script src="/js/user-dashboard.js"></script>
     </div>
 
+    <script th:src="@{/js/user-dashboard.js}"></script>
 </body>
 </html>

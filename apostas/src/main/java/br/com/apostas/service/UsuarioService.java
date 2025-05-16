@@ -53,6 +53,10 @@ public class UsuarioService {
         if (!passwordEncoder.matches(senha, usuario.getSenha())) {
             throw new RuntimeException("Credenciais inválidas!");
         }
+        
+        if (!usuario.isAtivo()) {
+            throw new RuntimeException("Usuário desativado! Acesso negado.");
+        }
 
         String token = gerarTokenJwt(usuario);
         String role = usuario.getTipo().name(); // Supondo que role seja um ENUM

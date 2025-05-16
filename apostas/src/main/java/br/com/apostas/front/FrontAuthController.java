@@ -30,11 +30,16 @@ public class FrontAuthController {
     
     @GetMapping("/user/apostar")
     public String apostar(Model model, @AuthenticationPrincipal Usuario usuario) {
-        model.addAttribute("usuario", usuario); // 🔹 Passa os dados do usuário autenticado
-        model.addAttribute("partidas", partidaService.listarTodas()); // 🔹 Carrega as partidas cadastradas no banco
-        return "aposta"; // 🔹 Retorna a página de apostas
-    }   
-   
+        System.out.println("🔹 Usuário autenticado: " + (usuario != null ? usuario.getEmail() : "Nenhum usuário encontrado"));
+
+        if (usuario == null) {
+            return "redirect:/auth/login"; // 🔹 Redireciona se não houver usuário autenticado
+        }
+
+        model.addAttribute("usuario", usuario); 
+        model.addAttribute("partidas", partidaService.buscarPartidasAtivas()); 
+        return "aposta";
+    }
 
     @GetMapping("/") // Página inicial
     public String homePage() {
@@ -47,7 +52,7 @@ public class FrontAuthController {
     }
     
     @GetMapping("/auth/cadastro") // Página de cadastro de usuário
-    public String registerPage() {
+    public String registerPage(Model model) {
         return "cadastro"; // Carrega register.html
     }
 
